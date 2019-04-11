@@ -1,0 +1,38 @@
+{
+    "name": "iterable-eternal-storage",
+    "version": "1.0.0",
+    "description": "A Solidity eternal storage smart contract with iterable functionality",
+    "scripts": {
+        "coverage": "solidity-coverage",
+        "lint": "solium -d contracts",
+        "test": "truffle test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/IoBuilders/iterable-eternal-storage.git"
+    },
+    "keywords": [
+        "solidity",
+        "ethereum",
+        "smart",
+        "contract",
+        "eternal",
+        "iterable"
+    ],
+    "author": "IO.BUILDERS <tech@io.builders>",
+    "dependencies": {
+        "openzeppelin-solidity": "^2.2.0"
+    },
+    "devDependencies": {
+        "random-number": "0.0.9",
+        "randomstring": "^1.1.5",
+        "solidity-coverage": "^0.5.11",
+        "truffle": "^5.0.12",
+        "truffle-assertions": "^0.7.2"
+    },
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/IoBuilders/iterable-eternal-storage/issues"
+    },
+    "homepage": "https://github.com/IoBuilders/iterable-eternal-storage#readme"
+}
