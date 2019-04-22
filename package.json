@@ -17,6 +17,7 @@
         "smart",
         "contract",
         "eternal",
+        "storage",
         "iterable"
     ],
     "author": "IO.BUILDERS <tech@io.builders>",
@@ -26,8 +27,8 @@
     "devDependencies": {
         "random-number": "0.0.9",
         "randomstring": "^1.1.5",
-        "solidity-coverage": "^0.5.11",
-        "truffle": "^5.0.12",
+        "solidity-coverage": "^0.6.0-beta.5",
+        "truffle": "^5.0.13",
         "truffle-assertions": "^0.7.2"
     },
     "license": "Apache-2.0",
