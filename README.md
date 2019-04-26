@@ -1,5 +1,8 @@
 # Iterable Eternal Storage
 
+[![Build Status](https://travis-ci.org/IoBuilders/iterable-eternal-storage.svg?branch=master)](https://travis-ci.org/IoBuilders/iterable-eternal-storage)
+[![Coverage Status](https://coveralls.io/repos/github/IoBuilders/iterable-eternal-storage/badge.svg?branch=master)](https://coveralls.io/github/IoBuilders/iterable-eternal-storage?branch=master)
+
 This library provides Solidity smart contracts for [eternal storage](https://fravoll.github.io/solidity-patterns/eternal_storage.html) with iterable functionality. 
 
 The aim is to provide smart contracts, which only contain the data of an application. Through the separation of logic and data make the dApp is upgradable.  
