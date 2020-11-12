@@ -6,6 +6,7 @@ const IterableEternalStorage = artifacts.require("IterableEternalStorage");
 
 let listSize;
 let values;
+let texts;
 let offset;
 let limit;
 let expectedListSize;
@@ -35,6 +36,7 @@ function initListTest() {
     // size between 2 and 10
     listSize = Math.floor(Math.random() * 10) + 2;
     values = [];
+    texts = [];
     // between 0 and (listSize - 1)
     offset = Math.floor(Math.random() * (listSize - 1));
     randomIndex = offset;
@@ -919,17 +921,11 @@ contract('IterableEternalStorage', (accounts) => {
 
                 const addressValues = await iterableEternalStorage.getAddressKeys(listId);
 
-                for (let i = 0; i < addressValues.length; i++) {
-                    addressValues[i] = (addressValues[i]).toLowerCase();
-                }
-
-                // sort, because the values can be in a different order
-                addressValues.sort();
-                values.sort();
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(values[i], addressValues[i]);
-                }
+                addressValues.forEach((addressValue) => {
+                    const index = values.indexOf(addressValue.toLowerCase());
+                    assert.notStrictEqual(index, -1, `${addressValue.toLowerCase()} is not included in ${values}`);
+                    assert.strictEqual(addressValue.toLowerCase(), values[index]);
+                });
             });
 
             it("should remove the last key and decrease the key size", async () => {
@@ -964,10 +960,12 @@ contract('IterableEternalStorage', (accounts) => {
     describe('Bytes8', () => {
         beforeEach(async () => {
             for (let i = 0; i < listSize; i++) {
+                let text;
                 let value;
 
                 while (true) {
-                    value = web3.utils.hexToBytes(web3.utils.randomHex(8));
+                    text = randomString.generate(8);
+                    value = web3.utils.fromAscii(text);
 
                     if (!values.includes(value)) {
                         break;
@@ -976,10 +974,11 @@ contract('IterableEternalStorage', (accounts) => {
 
                 await iterableEternalStorage.addBytes8Key(listId, value);
                 values.push(value);
+                texts.push(text);
             }
 
             while (true) {
-                valueNotInList = web3.utils.hexToBytes(web3.utils.randomHex(8));
+                valueNotInList = web3.utils.fromAscii(randomString.generate(8));
 
                 if (!values.includes(valueNotInList)) {
                     break;
@@ -998,7 +997,7 @@ contract('IterableEternalStorage', (accounts) => {
 
             it("should add a key and increase the key size", async () => {
                 const bytes8Value = await iterableEternalStorage.getBytes8KeyByIndex(listId, 0);
-                assert.strictEqual(web3.utils.bytesToHex(values[0]), bytes8Value, 'Incorrect value was saved');
+                assert.strictEqual(texts[0], web3.utils.toAscii(bytes8Value), 'Incorrect value was saved');
 
                 let actualListSize = await iterableEternalStorage.getBytes8KeySize(listId);
                 assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
@@ -1012,7 +1011,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(listSize, bytes8Values.length, `Expected size of returned array to be ${listSize}, but is ${bytes8Values.length}`);
 
                 for (let i = 0; i < listSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes8Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes8Values[i]));
                 }
             });
         });
@@ -1028,7 +1027,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(expectedListSize, bytes8Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${bytes8Values.length}`);
 
                 for (let i = 0; i < expectedListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i + offset]), bytes8Values[i]);
+                    assert.strictEqual(texts[i + offset], web3.utils.toAscii(bytes8Values[i]));
                 }
             });
         });
@@ -1045,24 +1044,20 @@ contract('IterableEternalStorage', (accounts) => {
             it("should remove a key and decrease the key size", async () => {
                 await truffleAssert.passes(iterableEternalStorage.removeBytes8Key(listId, values[randomIndex]));
                 // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
+                texts.splice(randomIndex, 1);
 
                 let newListSize = await iterableEternalStorage.getBytes8KeySize(listId);
                 assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
 
                 const bytes8Values = await iterableEternalStorage.getBytes8Keys(listId);
 
-                for (let i = 0; i < bytes8Values.length; i++) {
-                    values[i] = web3.utils.bytesToHex(values[i]);
-                }
+                let textValues = [];
+                bytes8Values.forEach((value) => textValues.push(web3.utils.toAscii(value)) );
 
                 // sort, because the values can be in a different order
-                bytes8Values.sort();
-                values.sort();
+                texts = texts.sort();
 
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(values[i], bytes8Values[i]);
-                }
+                textValues.sort().forEach((text, index) => assert.strictEqual(texts[index], text) );
             });
 
             it("should remove the last key and decrease the key size", async () => {
@@ -1076,7 +1071,7 @@ contract('IterableEternalStorage', (accounts) => {
                 const bytes8Values = await iterableEternalStorage.getBytes8Keys(listId);
 
                 for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes8Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes8Values[i]));
                 }
             });
         });
@@ -1097,10 +1092,12 @@ contract('IterableEternalStorage', (accounts) => {
     describe('Bytes16', () => {
         beforeEach(async () => {
             for (let i = 0; i < listSize; i++) {
+                let text;
                 let value;
 
                 while (true) {
-                    value = web3.utils.hexToBytes(web3.utils.randomHex(16));
+                    text = randomString.generate(16);
+                    value = web3.utils.fromAscii(text);
 
                     if (!values.includes(value)) {
                         break;
@@ -1109,10 +1106,11 @@ contract('IterableEternalStorage', (accounts) => {
 
                 await iterableEternalStorage.addBytes16Key(listId, value);
                 values.push(value);
+                texts.push(text);
             }
 
             while (true) {
-                valueNotInList = web3.utils.hexToBytes(web3.utils.randomHex(16));
+                valueNotInList = web3.utils.fromAscii(randomString.generate(16));
 
                 if (!values.includes(valueNotInList)) {
                     break;
@@ -1131,7 +1129,7 @@ contract('IterableEternalStorage', (accounts) => {
 
             it("should add a key and increase the key size", async () => {
                 const bytes16Value = await iterableEternalStorage.getBytes16KeyByIndex(listId, 0);
-                assert.strictEqual(web3.utils.bytesToHex(values[0]), bytes16Value, 'Incorrect value was saved');
+                assert.strictEqual(texts[0], web3.utils.toAscii(bytes16Value), 'Incorrect value was saved');
 
                 let actualListSize = await iterableEternalStorage.getBytes16KeySize(listId);
                 assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
@@ -1145,7 +1143,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(listSize, bytes16Values.length, `Expected size of returned array to be ${listSize}, but is ${bytes16Values.length}`);
 
                 for (let i = 0; i < listSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes16Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes16Values[i]));
                 }
             });
         });
@@ -1161,7 +1159,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(expectedListSize, bytes16Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${bytes16Values.length}`);
 
                 for (let i = 0; i < expectedListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i + offset]), bytes16Values[i]);
+                    assert.strictEqual(texts[i + offset], web3.utils.toAscii(bytes16Values[i]));
                 }
             });
         });
@@ -1178,24 +1176,20 @@ contract('IterableEternalStorage', (accounts) => {
             it("should remove a key and decrease the key size", async () => {
                 await truffleAssert.passes(iterableEternalStorage.removeBytes16Key(listId, values[randomIndex]));
                 // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
+                texts.splice(randomIndex, 1);
 
                 let newListSize = await iterableEternalStorage.getBytes16KeySize(listId);
                 assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
 
                 const bytes16Values = await iterableEternalStorage.getBytes16Keys(listId);
 
-                for (let i = 0; i < bytes16Values.length; i++) {
-                    values[i] = web3.utils.bytesToHex(values[i]);
-                }
+                let textValues = [];
+                bytes16Values.forEach((value) => textValues.push(web3.utils.toAscii(value)) );
 
                 // sort, because the values can be in a different order
-                bytes16Values.sort();
-                values.sort();
+                texts = texts.sort();
 
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(values[i], bytes16Values[i]);
-                }
+                textValues.sort().forEach((text, index) => assert.strictEqual(texts[index], text) );
             });
 
             it("should remove the last key and decrease the key size", async () => {
@@ -1209,7 +1203,7 @@ contract('IterableEternalStorage', (accounts) => {
                 const bytes16Values = await iterableEternalStorage.getBytes16Keys(listId);
 
                 for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes16Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes16Values[i]));
                 }
             });
         });
@@ -1233,7 +1227,8 @@ contract('IterableEternalStorage', (accounts) => {
                 let value;
 
                 while (true) {
-                    value = web3.utils.hexToBytes(web3.utils.randomHex(32));
+                    text = randomString.generate(32);
+                    value = web3.utils.fromAscii(text);
 
                     if (!values.includes(value)) {
                         break;
@@ -1242,10 +1237,11 @@ contract('IterableEternalStorage', (accounts) => {
 
                 await iterableEternalStorage.addBytes32Key(listId, value);
                 values.push(value);
+                texts.push(text);
             }
 
             while (true) {
-                valueNotInList = web3.utils.hexToBytes(web3.utils.randomHex(32));
+                valueNotInList = web3.utils.fromAscii(randomString.generate(32));
 
                 if (!values.includes(valueNotInList)) {
                     break;
@@ -1264,7 +1260,7 @@ contract('IterableEternalStorage', (accounts) => {
 
             it("should add a key and increase the key size", async () => {
                 const bytes32Value = await iterableEternalStorage.getBytes32KeyByIndex(listId, 0);
-                assert.strictEqual(web3.utils.bytesToHex(values[0]), bytes32Value, 'Incorrect value was saved');
+                assert.strictEqual(texts[0], web3.utils.toAscii(bytes32Value), 'Incorrect value was saved');
 
                 let actualListSize = await iterableEternalStorage.getBytes32KeySize(listId);
                 assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
@@ -1278,7 +1274,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(listSize, bytes32Values.length, `Expected size of returned array to be ${listSize}, but is ${bytes32Values.length}`);
 
                 for (let i = 0; i < listSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes32Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes32Values[i]));
                 }
             });
         });
@@ -1294,7 +1290,7 @@ contract('IterableEternalStorage', (accounts) => {
                 assert.strictEqual(expectedListSize, bytes32Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${bytes32Values.length}`);
 
                 for (let i = 0; i < expectedListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i + offset]), bytes32Values[i]);
+                    assert.strictEqual(texts[i + offset], web3.utils.toAscii(bytes32Values[i]));
                 }
             });
         });
@@ -1311,24 +1307,20 @@ contract('IterableEternalStorage', (accounts) => {
             it("should remove a key and decrease the key size", async () => {
                 await truffleAssert.passes(iterableEternalStorage.removeBytes32Key(listId, values[randomIndex]));
                 // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
+                texts.splice(randomIndex, 1);
 
                 let newListSize = await iterableEternalStorage.getBytes32KeySize(listId);
                 assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
 
                 const bytes32Values = await iterableEternalStorage.getBytes32Keys(listId);
 
-                for (let i = 0; i < bytes32Values.length; i++) {
-                    values[i] = web3.utils.bytesToHex(values[i]);
-                }
+                let textValues = [];
+                bytes32Values.forEach((value) => textValues.push(web3.utils.toAscii(value)) );
 
                 // sort, because the values can be in a different order
-                bytes32Values.sort();
-                values.sort();
+                texts = texts.sort();
 
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(values[i], bytes32Values[i]);
-                }
+                textValues.sort().forEach((text, index) => assert.strictEqual(texts[index], text) );
             });
 
             it("should remove the last key and decrease the key size", async () => {
@@ -1342,7 +1334,7 @@ contract('IterableEternalStorage', (accounts) => {
                 const bytes32Values = await iterableEternalStorage.getBytes32Keys(listId);
 
                 for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(web3.utils.bytesToHex(values[i]), bytes32Values[i]);
+                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes32Values[i]));
                 }
             });
         });
