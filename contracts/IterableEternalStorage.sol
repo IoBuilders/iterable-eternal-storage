@@ -1,7 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.7.1;
+// SPDX-License-Identifier: Apache-2.0
 
 import "./EternalStorage.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./IIterableEternalStorage.sol";
 
 
@@ -31,7 +32,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
     bytes32 private constant STRING_ID = "string";
 
     // *** UInt8 ***
-    function addUInt8Key(bytes32 _listId, uint8 _value) public {
+    function addUInt8Key(bytes32 _listId, uint8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(UINT8_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -39,7 +40,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setUInt8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeUInt8Key(bytes32 _listId, uint8 _value) public {
+    function removeUInt8Key(bytes32 _listId, uint8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(UINT8_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -71,15 +72,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getUInt8KeySize(bytes32 _listId) public view returns (uint256) {
+    function getUInt8KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(UINT8_ID, _listId);
     }
 
-    function getUInt8Keys(bytes32 _listId) public view returns (uint8[] memory) {
+    function getUInt8Keys(bytes32 _listId) public override view returns (uint8[] memory) {
         return getRangeOfUInt8Keys(_listId, 0, getUInt8KeySize(_listId));
     }
 
-    function getRangeOfUInt8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (uint8[] memory) {
+    function getRangeOfUInt8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (uint8[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getUInt8KeySize(_listId), _offset, _limit);
 
         uint8[] memory list = new uint8[](rangeSize);
@@ -91,16 +92,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getUInt8KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (uint8) {
+    function getUInt8KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (uint8) {
         return getUInt8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsUInt8Key(bytes32 _listId, uint8 _value) public view returns (bool) {
+    function existsUInt8Key(bytes32 _listId, uint8 _value) public override view returns (bool) {
         return _existsInIterableList(UINT8_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** UInt128 ***
-    function addUInt128Key(bytes32 _listId, uint128 _value) public {
+    function addUInt128Key(bytes32 _listId, uint128 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(UINT128_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -108,7 +109,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setUInt128(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeUInt128Key(bytes32 _listId, uint128 _value) public {
+    function removeUInt128Key(bytes32 _listId, uint128 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(UINT128_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -140,15 +141,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getUInt128KeySize(bytes32 _listId) public view returns (uint256) {
+    function getUInt128KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(UINT128_ID, _listId);
     }
 
-    function getUInt128Keys(bytes32 _listId) public view returns (uint128[] memory) {
+    function getUInt128Keys(bytes32 _listId) public override view returns (uint128[] memory) {
         return getRangeOfUInt128Keys(_listId, 0, getUInt128KeySize(_listId));
     }
 
-    function getRangeOfUInt128Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (uint128[] memory) {
+    function getRangeOfUInt128Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (uint128[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getUInt128KeySize(_listId), _offset, _limit);
 
         uint128[] memory list = new uint128[](rangeSize);
@@ -160,16 +161,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getUInt128KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (uint128) {
+    function getUInt128KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (uint128) {
         return getUInt128(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsUInt128Key(bytes32 _listId, uint128 _value) public view returns (bool) {
+    function existsUInt128Key(bytes32 _listId, uint128 _value) public override view returns (bool) {
         return _existsInIterableList(UINT128_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** UInt256 ***
-    function addUInt256Key(bytes32 _listId, uint256 _value) public {
+    function addUInt256Key(bytes32 _listId, uint256 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(UINT256_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -177,7 +178,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setUInt256(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeUInt256Key(bytes32 _listId, uint256 _value) public {
+    function removeUInt256Key(bytes32 _listId, uint256 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(UINT256_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -209,15 +210,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getUInt256KeySize(bytes32 _listId) public view returns (uint256) {
+    function getUInt256KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(UINT256_ID, _listId);
     }
 
-    function getUInt256Keys(bytes32 _listId) public view returns (uint256[] memory) {
+    function getUInt256Keys(bytes32 _listId) public override view returns (uint256[] memory) {
         return getRangeOfUInt256Keys(_listId, 0, getUInt256KeySize(_listId));
     }
 
-    function getRangeOfUInt256Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (uint256[] memory) {
+    function getRangeOfUInt256Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (uint256[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getUInt256KeySize(_listId), _offset, _limit);
 
         uint256[] memory list = new uint256[](rangeSize);
@@ -229,16 +230,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getUInt256KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (uint256) {
+    function getUInt256KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (uint256) {
         return getUInt256(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsUInt256Key(bytes32 _listId, uint256 _value) public view returns (bool) {
+    function existsUInt256Key(bytes32 _listId, uint256 _value) public override view returns (bool) {
         return _existsInIterableList(UINT256_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Int8 ***
-    function addInt8Key(bytes32 _listId, int8 _value) public {
+    function addInt8Key(bytes32 _listId, int8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(INT8_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -246,7 +247,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setInt8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeInt8Key(bytes32 _listId, int8 _value) public {
+    function removeInt8Key(bytes32 _listId, int8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(INT8_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -278,15 +279,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getInt8KeySize(bytes32 _listId) public view returns (uint256) {
+    function getInt8KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(INT8_ID, _listId);
     }
 
-    function getInt8Keys(bytes32 _listId) public view returns (int8[] memory) {
+    function getInt8Keys(bytes32 _listId) public override view returns (int8[] memory) {
         return getRangeOfInt8Keys(_listId, 0, getInt8KeySize(_listId));
     }
 
-    function getRangeOfInt8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (int8[] memory) {
+    function getRangeOfInt8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (int8[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getInt8KeySize(_listId), _offset, _limit);
 
         int8[] memory list = new int8[](rangeSize);
@@ -298,16 +299,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getInt8KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (int8) {
+    function getInt8KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (int8) {
         return getInt8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsInt8Key(bytes32 _listId, int8 _value) public view returns (bool) {
+    function existsInt8Key(bytes32 _listId, int8 _value) public override view returns (bool) {
         return _existsInIterableList(INT8_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Int128 ***
-    function addInt128Key(bytes32 _listId, int128 _value) public {
+    function addInt128Key(bytes32 _listId, int128 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(INT128_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -315,7 +316,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setInt128(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeInt128Key(bytes32 _listId, int128 _value) public {
+    function removeInt128Key(bytes32 _listId, int128 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(INT128_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -347,15 +348,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getInt128KeySize(bytes32 _listId) public view returns (uint256) {
+    function getInt128KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(INT128_ID, _listId);
     }
 
-    function getInt128Keys(bytes32 _listId) public view returns (int128[] memory) {
+    function getInt128Keys(bytes32 _listId) public override view returns (int128[] memory) {
         return getRangeOfInt128Keys(_listId, 0, getInt128KeySize(_listId));
     }
 
-    function getRangeOfInt128Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (int128[] memory) {
+    function getRangeOfInt128Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (int128[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getInt128KeySize(_listId), _offset, _limit);
 
         int128[] memory list = new int128[](rangeSize);
@@ -367,16 +368,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getInt128KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (int128) {
+    function getInt128KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (int128) {
         return getInt128(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsInt128Key(bytes32 _listId, int128 _value) public view returns (bool) {
+    function existsInt128Key(bytes32 _listId, int128 _value) public override view returns (bool) {
         return _existsInIterableList(INT128_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Int256 ***
-    function addInt256Key(bytes32 _listId, int256 _value) public {
+    function addInt256Key(bytes32 _listId, int256 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(INT256_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -384,7 +385,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setInt256(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeInt256Key(bytes32 _listId, int256 _value) public {
+    function removeInt256Key(bytes32 _listId, int256 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(INT256_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -416,15 +417,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getInt256KeySize(bytes32 _listId) public view returns (uint256) {
+    function getInt256KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(INT256_ID, _listId);
     }
 
-    function getInt256Keys(bytes32 _listId) public view returns (int256[] memory) {
+    function getInt256Keys(bytes32 _listId) public override view returns (int256[] memory) {
         return getRangeOfInt256Keys(_listId, 0, getInt256KeySize(_listId));
     }
 
-    function getRangeOfInt256Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (int256[] memory) {
+    function getRangeOfInt256Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (int256[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getInt256KeySize(_listId), _offset, _limit);
 
         int256[] memory list = new int256[](rangeSize);
@@ -436,16 +437,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getInt256KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (int256) {
+    function getInt256KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (int256) {
         return getInt256(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsInt256Key(bytes32 _listId, int256 _value) public view returns (bool) {
+    function existsInt256Key(bytes32 _listId, int256 _value) public override view returns (bool) {
         return _existsInIterableList(INT256_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Address ***
-    function addAddressKey(bytes32 _listId, address _value) public {
+    function addAddressKey(bytes32 _listId, address _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(ADDRESS_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -453,7 +454,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setAddress(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeAddressKey(bytes32 _listId, address _value) public {
+    function removeAddressKey(bytes32 _listId, address _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(ADDRESS_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -485,15 +486,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getAddressKeySize(bytes32 _listId) public view returns (uint256) {
+    function getAddressKeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(ADDRESS_ID, _listId);
     }
 
-    function getAddressKeys(bytes32 _listId) public view returns (address[] memory) {
+    function getAddressKeys(bytes32 _listId) public override view returns (address[] memory) {
         return getRangeOfAddressKeys(_listId, 0, getAddressKeySize(_listId));
     }
 
-    function getRangeOfAddressKeys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (address[] memory) {
+    function getRangeOfAddressKeys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (address[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getAddressKeySize(_listId), _offset, _limit);
 
         address[] memory list = new address[](rangeSize);
@@ -505,16 +506,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getAddressKeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (address) {
+    function getAddressKeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (address) {
         return getAddress(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsAddressKey(bytes32 _listId, address _value) public view returns (bool) {
+    function existsAddressKey(bytes32 _listId, address _value) public override view returns (bool) {
         return _existsInIterableList(ADDRESS_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Bytes8 ***
-    function addBytes8Key(bytes32 _listId, bytes8 _value) public {
+    function addBytes8Key(bytes32 _listId, bytes8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(BYTES8_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -522,7 +523,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setBytes8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeBytes8Key(bytes32 _listId, bytes8 _value) public {
+    function removeBytes8Key(bytes32 _listId, bytes8 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(BYTES8_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -554,15 +555,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getBytes8KeySize(bytes32 _listId) public view returns (uint256) {
+    function getBytes8KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(BYTES8_ID, _listId);
     }
 
-    function getBytes8Keys(bytes32 _listId) public view returns (bytes8[] memory) {
+    function getBytes8Keys(bytes32 _listId) public override view returns (bytes8[] memory) {
         return getRangeOfBytes8Keys(_listId, 0, getBytes8KeySize(_listId));
     }
 
-    function getRangeOfBytes8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (bytes8[] memory) {
+    function getRangeOfBytes8Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (bytes8[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getBytes8KeySize(_listId), _offset, _limit);
 
         bytes8[] memory list = new bytes8[](rangeSize);
@@ -574,16 +575,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getBytes8KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (bytes8) {
+    function getBytes8KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (bytes8) {
         return getBytes8(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsBytes8Key(bytes32 _listId, bytes8 _value) public view returns (bool) {
+    function existsBytes8Key(bytes32 _listId, bytes8 _value) public override view returns (bool) {
         return _existsInIterableList(BYTES8_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Bytes16 ***
-    function addBytes16Key(bytes32 _listId, bytes16 _value) public {
+    function addBytes16Key(bytes32 _listId, bytes16 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(BYTES16_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -591,7 +592,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setBytes16(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeBytes16Key(bytes32 _listId, bytes16 _value) public {
+    function removeBytes16Key(bytes32 _listId, bytes16 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(BYTES16_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -623,15 +624,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getBytes16KeySize(bytes32 _listId) public view returns (uint256) {
+    function getBytes16KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(BYTES16_ID, _listId);
     }
 
-    function getBytes16Keys(bytes32 _listId) public view returns (bytes16[] memory) {
+    function getBytes16Keys(bytes32 _listId) public override view returns (bytes16[] memory) {
         return getRangeOfBytes16Keys(_listId, 0, getBytes16KeySize(_listId));
     }
 
-    function getRangeOfBytes16Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (bytes16[] memory) {
+    function getRangeOfBytes16Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (bytes16[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getBytes16KeySize(_listId), _offset, _limit);
 
         bytes16[] memory list = new bytes16[](rangeSize);
@@ -643,16 +644,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getBytes16KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (bytes16) {
+    function getBytes16KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (bytes16) {
         return getBytes16(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsBytes16Key(bytes32 _listId, bytes16 _value) public view returns (bool) {
+    function existsBytes16Key(bytes32 _listId, bytes16 _value) public override view returns (bool) {
         return _existsInIterableList(BYTES16_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** Bytes32 ***
-    function addBytes32Key(bytes32 _listId, bytes32 _value) public {
+    function addBytes32Key(bytes32 _listId, bytes32 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(BYTES32_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -660,7 +661,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setBytes32(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeBytes32Key(bytes32 _listId, bytes32 _value) public {
+    function removeBytes32Key(bytes32 _listId, bytes32 _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(BYTES32_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -692,15 +693,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getBytes32KeySize(bytes32 _listId) public view returns (uint256) {
+    function getBytes32KeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(BYTES32_ID, _listId);
     }
 
-    function getBytes32Keys(bytes32 _listId) public view returns (bytes32[] memory) {
+    function getBytes32Keys(bytes32 _listId) public override view returns (bytes32[] memory) {
         return getRangeOfBytes32Keys(_listId, 0, getBytes32KeySize(_listId));
     }
 
-    function getRangeOfBytes32Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public view returns (bytes32[] memory) {
+    function getRangeOfBytes32Keys(bytes32 _listId, uint256 _offset, uint256 _limit) public override view returns (bytes32[] memory) {
         uint256 rangeSize = _calculateRangeSizeOfList(getBytes32KeySize(_listId), _offset, _limit);
 
         bytes32[] memory list = new bytes32[](rangeSize);
@@ -712,16 +713,16 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         return list;
     }
 
-    function getBytes32KeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (bytes32) {
+    function getBytes32KeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (bytes32) {
         return getBytes32(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsBytes32Key(bytes32 _listId, bytes32 _value) public view returns (bool) {
+    function existsBytes32Key(bytes32 _listId, bytes32 _value) public override view returns (bool) {
         return _existsInIterableList(BYTES32_ID, _listId, keccak256(abi.encode(_value)));
     }
 
     // *** String ***
-    function addStringKey(bytes32 _listId, string memory _value) public {
+    function addStringKey(bytes32 _listId, string memory _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(!_existsInIterableList(STRING_ID, _listId, valueHash), "Key exists already in the list");
 
@@ -729,7 +730,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         setString(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, index)), _value);
     }
 
-    function removeStringKey(bytes32 _listId, string memory _value) public {
+    function removeStringKey(bytes32 _listId, string memory _value) public override {
         bytes32 valueHash = keccak256(abi.encode(_value));
         require(_existsInIterableList(STRING_ID, _listId, valueHash), "Key does not exist in the list");
 
@@ -761,15 +762,15 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
         }
     }
 
-    function getStringKeySize(bytes32 _listId) public view returns (uint256) {
+    function getStringKeySize(bytes32 _listId) public override view returns (uint256) {
         return _getKeySize(STRING_ID, _listId);
     }
 
-    function getStringKeyByIndex(bytes32 _listId, uint256 _listIndex) public view returns (string memory) {
+    function getStringKeyByIndex(bytes32 _listId, uint256 _listIndex) public override view returns (string memory) {
         return getString(keccak256(abi.encodePacked(_listId, VALUES_POSTFIX, _listIndex)));
     }
 
-    function existsStringKey(bytes32 _listId, string memory _value) public view returns (bool) {
+    function existsStringKey(bytes32 _listId, string memory _value) public override view returns (bool) {
         return _existsInIterableList(STRING_ID, _listId, keccak256(abi.encode(_value)));
     }
 

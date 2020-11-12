@@ -167,13 +167,14 @@ contract('EternalStorage', (accounts) => {
     });
 
     it("getBytes8, setBytes8 and deleteBytes8 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(8));
+        const text = randomString.generate(8);
+        const value = web3.utils.fromAscii(text);
 
         await truffleAssert.reverts(eternalStorage.setBytes8(key, value, {from: accounts[1]}));
         await truffleAssert.passes(eternalStorage.setBytes8(key, value));
 
         let bytes8Value = await eternalStorage.getBytes8(key);
-        assert.strictEqual(bytes8Value, web3.utils.bytesToHex(value));
+        assert.strictEqual(web3.utils.toAscii(bytes8Value), text);
 
         await eternalStorage.deleteBytes8(key);
 
@@ -182,13 +183,14 @@ contract('EternalStorage', (accounts) => {
     });
 
     it("getBytes16, setBytes16 and deleteBytes16 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(16));
+        const text = randomString.generate(16);
+        const value = web3.utils.fromAscii(text);
 
         await truffleAssert.reverts(eternalStorage.setBytes16(key, value, {from: accounts[1]}));
         await truffleAssert.passes(eternalStorage.setBytes16(key, value));
 
         let bytes16Value = await eternalStorage.getBytes16(key);
-        assert.strictEqual(bytes16Value, web3.utils.bytesToHex(value));
+        assert.strictEqual(web3.utils.toAscii(bytes16Value), text);
 
         await eternalStorage.deleteBytes16(key);
 
@@ -197,13 +199,14 @@ contract('EternalStorage', (accounts) => {
     });
 
     it("getBytes32, setBytes32 and deleteBytes32 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(32));
+        const text = randomString.generate(32);
+        const value = web3.utils.fromAscii(text);
 
         await truffleAssert.reverts(eternalStorage.setBytes32(key, value, {from: accounts[1]}));
         await truffleAssert.passes(eternalStorage.setBytes32(key, value));
 
         let bytes32Value = await eternalStorage.getBytes32(key);
-        assert.strictEqual(bytes32Value, web3.utils.bytesToHex(value));
+        assert.strictEqual(web3.utils.toAscii(bytes32Value), text);
 
         await eternalStorage.deleteBytes32(key);
 
