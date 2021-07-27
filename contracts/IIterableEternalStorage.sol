@@ -1,4 +1,4 @@
-pragma solidity ^0.7.1;
+pragma solidity ^0.7.5;
 // SPDX-License-Identifier: Apache-2.0
 
 import "./IEternalStorage.sol";

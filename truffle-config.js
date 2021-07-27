@@ -16,17 +16,18 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: '0.7.1',
+            version: '0.7.5',
             docker: true,
             settings: {
                 optimizer: {
                     enabled: true,
-                    runs: 200
+                    runs: 1
                 }
             }
         }
     },
     plugins: [
+        "truffle-contract-size",
         "solidity-coverage",
     ]
 };

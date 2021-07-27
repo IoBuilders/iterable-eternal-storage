@@ -1,4 +1,4 @@
-pragma solidity ^0.7.1;
+pragma solidity ^0.7.5;
 // SPDX-License-Identifier: Apache-2.0
 
 
@@ -62,4 +62,9 @@ interface IEternalStorage {
     function getString(bytes32 _key) external view returns (string memory);
     function setString(bytes32 _key, string memory _value) external;
     function deleteString(bytes32 _key) external;
+
+    // *** bytes ***
+    function getBytes(bytes32 _key) external view returns (bytes memory);
+    function setBytes(bytes32 _key, bytes memory _value) external;
+    function deleteBytes(bytes32 _key) external;
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.7.1;
+pragma solidity ^0.7.5;
 // SPDX-License-Identifier: Apache-2.0
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -21,6 +21,7 @@ contract EternalStorage is IEternalStorage, Ownable {
     mapping(bytes32 => bytes16) internal bytes16Storage;
     mapping(bytes32 => bytes32) internal bytes32Storage;
     mapping(bytes32 => string) internal stringStorage;
+    mapping(bytes32 => bytes) internal bytesStorage;
 
     modifier onlyLatestVersion() {
         require(msg.sender == latestVersion, "only the latest version of the contract can call setters");
@@ -191,5 +192,18 @@ contract EternalStorage is IEternalStorage, Ownable {
 
     function deleteString(bytes32 _key) public override onlyLatestVersion {
         delete stringStorage[_key];
+    }
+
+    // *** bytes ***
+    function getBytes(bytes32 _key) public override view returns (bytes memory) {
+        return bytesStorage[_key];
+    }
+
+    function setBytes(bytes32 _key, bytes memory _value) public override onlyLatestVersion {
+        bytesStorage[_key] = _value;
+    }
+
+    function deleteBytes(bytes32 _key) public override onlyLatestVersion {
+        delete bytesStorage[_key];
     }
 }

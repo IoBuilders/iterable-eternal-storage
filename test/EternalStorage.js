@@ -228,4 +228,22 @@ contract('EternalStorage', (accounts) => {
         stringValue = await eternalStorage.getString(key);
         assert.strictEqual(stringValue, '');
     });
+
+    it("getBytes, setBytes and deleteBytes should work as expected", async() => {
+        const hexValue = web3.utils.toHex(
+            randomString.generate()
+        );
+        const value = web3.utils.hexToBytes(hexValue);
+
+        await truffleAssert.reverts(eternalStorage.setBytes(key, value, {from: accounts[1]}));
+        await truffleAssert.passes(eternalStorage.setBytes(key, value));
+
+        let bytesValue = await eternalStorage.getBytes(key);
+        assert.strictEqual(bytesValue, hexValue);
+
+        await eternalStorage.deleteBytes(key);
+
+        stringValue = await eternalStorage.getString(key);
+        assert.strictEqual(stringValue, '');
+    });
 });
