@@ -58,263 +58,6 @@ contract('IterableEternalStorage', (accounts) => {
         initListTest();
     });
 
-    describe('UInt8', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let value;
-
-                while (true) {
-                    value = getRandomUInt();
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-
-                await iterableEternalStorage.addUInt8Key(listId, value);
-                values.push(value);
-            }
-
-            while (true) {
-                valueNotInList = getRandomUInt();
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addUInt8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addUInt8Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addUInt8Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const uint8Value = await iterableEternalStorage.getUInt8KeyByIndex(listId, 0);
-                assert.isTrue(uint8Value.eq(web3.utils.toBN(values[0])), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getUInt8KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getUInt8Keys', async () => {
-            it("should return all items added by addUInt8Key", async () => {
-                const uint8Values = await iterableEternalStorage.getUInt8Keys(listId);
-
-                assert.strictEqual(listSize, uint8Values.length, `Expected size of returned array to be ${listSize}, but is ${uint8Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.isTrue(uint8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('getRangeOfUInt8Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfUInt8Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addUInt8Key", async () => {
-                const uint8Values = await iterableEternalStorage.getRangeOfUInt8Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, uint8Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${uint8Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.isTrue(uint8Values[i].eq(web3.utils.toBN(values[i + offset])));
-                }
-            });
-        });
-
-        describe('removeUInt8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeUInt8Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeUInt8Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeUInt8Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
-
-                const newListSize = await iterableEternalStorage.getUInt8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const uint8Values = await iterableEternalStorage.getUInt8Keys(listId);
-
-                // sort, because the values can be in a different order
-                uint8Values.sort();
-                values.sort();
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(uint8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeUInt8Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getUInt8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const uint8Values = await iterableEternalStorage.getUInt8Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(uint8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('existsUInt8Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsUInt8Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsUInt8Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
-    describe('UInt128', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let value;
-
-                while (true) {
-                    value = getRandomUInt();
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-                await iterableEternalStorage.addUInt128Key(listId, value);
-                values.push(value);
-            }
-
-            while (true) {
-                valueNotInList = getRandomUInt();
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addUInt128Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addUInt128Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addUInt128Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const uint128Value = await iterableEternalStorage.getUInt128KeyByIndex(listId, 0);
-                assert.isTrue(uint128Value.eq(web3.utils.toBN(values[0])), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getUInt128KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getUInt128Keys', async () => {
-            it("should return all items added by addUInt128Key", async () => {
-                const uint128Values = await iterableEternalStorage.getUInt128Keys(listId);
-
-                assert.strictEqual(listSize, uint128Values.length, `Expected size of returned array to be ${listSize}, but is ${uint128Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.isTrue(uint128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('getRangeOfUInt128Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfUInt128Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addUInt128Key", async () => {
-                const uint128Values = await iterableEternalStorage.getRangeOfUInt128Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, uint128Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${uint128Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.isTrue(uint128Values[i].eq(web3.utils.toBN(values[i + offset])));
-                }
-            });
-        });
-
-        describe('removeUInt128Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeUInt128Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeUInt128Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeUInt128Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
-
-                let newListSize = await iterableEternalStorage.getUInt128KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const uint128Values = await iterableEternalStorage.getUInt128Keys(listId);
-
-                // sort, because the values can be in a different order
-                uint128Values.sort();
-                values.sort();
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(uint128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeUInt128Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getUInt128KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const uint128Values = await iterableEternalStorage.getUInt128Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(uint128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('existsUInt128Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsUInt128Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsUInt128Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
     describe('UInt256', () => {
         beforeEach(async () => {
             for (let i = 0; i < listSize; i++) {
@@ -438,264 +181,6 @@ contract('IterableEternalStorage', (accounts) => {
 
             it("should false for a non-existing key", async () => {
                 const keyExists = await iterableEternalStorage.existsUInt256Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
-    describe('Int8', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let value;
-
-                while (true) {
-                    value = getRandomInt();
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-
-                await iterableEternalStorage.addInt8Key(listId, value);
-                values.push(value);
-            }
-
-            while (true) {
-                valueNotInList = getRandomInt();
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addInt8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addInt8Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addInt8Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const int8Value = await iterableEternalStorage.getInt8KeyByIndex(listId, 0);
-                assert.isTrue(int8Value.eq(web3.utils.toBN(values[0])), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getInt8KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getInt8Keys', async () => {
-            it("should return all items added by addInt8Key", async () => {
-                const int8Values = await iterableEternalStorage.getInt8Keys(listId);
-
-                assert.strictEqual(listSize, int8Values.length, `Expected size of returned array to be ${listSize}, but is ${int8Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.isTrue(int8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('getRangeOfInt8Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfInt8Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addInt8Key", async () => {
-                const int8Values = await iterableEternalStorage.getRangeOfInt8Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, int8Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${int8Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.isTrue(int8Values[i].eq(web3.utils.toBN(values[i + offset])));
-                }
-            });
-        });
-
-        describe('removeInt8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeInt8Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeInt8Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeInt8Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
-
-                let newListSize = await iterableEternalStorage.getInt8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const int8Values = await iterableEternalStorage.getInt8Keys(listId);
-
-                // sort, because the values can be in a different order
-                int8Values.sort();
-                values.sort();
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(int8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeInt8Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getInt8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const int8Values = await iterableEternalStorage.getInt8Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(int8Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('existsInt8Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsInt8Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsInt8Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
-    describe('Int128', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let value;
-
-                while (true) {
-                    value = getRandomInt();
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-
-                await iterableEternalStorage.addInt128Key(listId, value);
-                values.push(value);
-            }
-
-            while (true) {
-                valueNotInList = getRandomInt();
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addInt128Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addInt128Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addInt128Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const int128Value = await iterableEternalStorage.getInt128KeyByIndex(listId, 0);
-                assert.isTrue(int128Value.eq(web3.utils.toBN(values[0])), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getInt128KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getInt128Keys', async () => {
-            it("should return all items added by addInt128Key", async () => {
-                const int128Values = await iterableEternalStorage.getInt128Keys(listId);
-
-                assert.strictEqual(listSize, int128Values.length, `Expected size of returned array to be ${listSize}, but is ${int128Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.isTrue(int128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('getRangeOfInt128Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfInt128Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addInt128Key", async () => {
-                const int128Values = await iterableEternalStorage.getRangeOfInt128Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, int128Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${int128Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.isTrue(int128Values[i].eq(web3.utils.toBN(values[i + offset])));
-                }
-            });
-        });
-
-        describe('removeInt128Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeInt128Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeInt128Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeInt128Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                values.splice(randomIndex, 1);
-
-                let newListSize = await iterableEternalStorage.getInt128KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const int128Values = await iterableEternalStorage.getInt128Keys(listId);
-
-                // sort, because the values can be in a different order
-                int128Values.sort();
-                values.sort();
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(int128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeInt128Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getInt128KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const int128Values = await iterableEternalStorage.getInt128Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.isTrue(int128Values[i].eq(web3.utils.toBN(values[i])));
-                }
-            });
-        });
-
-        describe('existsInt128Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsInt128Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsInt128Key(listId, valueNotInList);
                 assert.isFalse(keyExists);
             });
         });
@@ -957,270 +442,6 @@ contract('IterableEternalStorage', (accounts) => {
         });
     });
 
-    describe('Bytes8', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let text;
-                let value;
-
-                while (true) {
-                    text = randomString.generate(8);
-                    value = web3.utils.fromAscii(text);
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-
-                await iterableEternalStorage.addBytes8Key(listId, value);
-                values.push(value);
-                texts.push(text);
-            }
-
-            while (true) {
-                valueNotInList = web3.utils.fromAscii(randomString.generate(8));
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addBytes8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addBytes8Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addBytes8Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const bytes8Value = await iterableEternalStorage.getBytes8KeyByIndex(listId, 0);
-                assert.strictEqual(texts[0], web3.utils.toAscii(bytes8Value), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getBytes8KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getBytes8Keys', async () => {
-            it("should return all items added by addBytes8Key", async () => {
-                const bytes8Values = await iterableEternalStorage.getBytes8Keys(listId);
-
-                assert.strictEqual(listSize, bytes8Values.length, `Expected size of returned array to be ${listSize}, but is ${bytes8Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes8Values[i]));
-                }
-            });
-        });
-
-        describe('getRangeOfBytes8Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfBytes8Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addBytes8Key", async () => {
-                const bytes8Values = await iterableEternalStorage.getRangeOfBytes8Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, bytes8Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${bytes8Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.strictEqual(texts[i + offset], web3.utils.toAscii(bytes8Values[i]));
-                }
-            });
-        });
-
-        describe('removeBytes8Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeBytes8Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeBytes8Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeBytes8Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                texts.splice(randomIndex, 1);
-
-                let newListSize = await iterableEternalStorage.getBytes8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const bytes8Values = await iterableEternalStorage.getBytes8Keys(listId);
-
-                let textValues = [];
-                bytes8Values.forEach((value) => textValues.push(web3.utils.toAscii(value)) );
-
-                // sort, because the values can be in a different order
-                texts = texts.sort();
-
-                textValues.sort().forEach((text, index) => assert.strictEqual(texts[index], text) );
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeBytes8Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getBytes8KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const bytes8Values = await iterableEternalStorage.getBytes8Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes8Values[i]));
-                }
-            });
-        });
-
-        describe('existsBytes8Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsBytes8Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsBytes8Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
-    describe('Bytes16', () => {
-        beforeEach(async () => {
-            for (let i = 0; i < listSize; i++) {
-                let text;
-                let value;
-
-                while (true) {
-                    text = randomString.generate(16);
-                    value = web3.utils.fromAscii(text);
-
-                    if (!values.includes(value)) {
-                        break;
-                    }
-                }
-
-                await iterableEternalStorage.addBytes16Key(listId, value);
-                values.push(value);
-                texts.push(text);
-            }
-
-            while (true) {
-                valueNotInList = web3.utils.fromAscii(randomString.generate(16));
-
-                if (!values.includes(valueNotInList)) {
-                    break;
-                }
-            }
-        });
-
-        describe('addBytes16Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addBytes16Key(listId, valueNotInList, {from: accounts[1]}));
-            });
-
-            it("should revert when an existing values is added", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.addBytes16Key(listId, values[0]));
-            });
-
-            it("should add a key and increase the key size", async () => {
-                const bytes16Value = await iterableEternalStorage.getBytes16KeyByIndex(listId, 0);
-                assert.strictEqual(texts[0], web3.utils.toAscii(bytes16Value), 'Incorrect value was saved');
-
-                let actualListSize = await iterableEternalStorage.getBytes16KeySize(listId);
-                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
-            });
-        });
-
-        describe('getBytes16Keys', async () => {
-            it("should return all items added by addBytes16Key", async () => {
-                const bytes16Values = await iterableEternalStorage.getBytes16Keys(listId);
-
-                assert.strictEqual(listSize, bytes16Values.length, `Expected size of returned array to be ${listSize}, but is ${bytes16Values.length}`);
-
-                for (let i = 0; i < listSize; i++) {
-                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes16Values[i]));
-                }
-            });
-        });
-
-        describe('getRangeOfBytes16Keys', async () => {
-            it('should revert if the offset is out of range', async () => {
-                await truffleAssert.reverts(iterableEternalStorage.getRangeOfBytes16Keys(listId, listSize, 1));
-            });
-
-            it("should return a range of items added by addBytes16Key", async () => {
-                const bytes16Values = await iterableEternalStorage.getRangeOfBytes16Keys(listId, offset, limit);
-
-                assert.strictEqual(expectedListSize, bytes16Values.length, `Expected size of returned array to be ${expectedListSize}, but is ${bytes16Values.length}`);
-
-                for (let i = 0; i < expectedListSize; i++) {
-                    assert.strictEqual(texts[i + offset], web3.utils.toAscii(bytes16Values[i]));
-                }
-            });
-        });
-
-        describe('removeBytes16Key', async () => {
-            it("should revert when not called by latest version", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeBytes16Key(listId, values[0], {from: accounts[1]}));
-            });
-
-            it("should revert when a non-existing key is given", async () => {
-                await truffleAssert.reverts(iterableEternalStorage.removeBytes16Key(listId, valueNotInList));
-            });
-
-            it("should remove a key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeBytes16Key(listId, values[randomIndex]));
-                // remove item which has been deleted in the smart contract
-                texts.splice(randomIndex, 1);
-
-                let newListSize = await iterableEternalStorage.getBytes16KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const bytes16Values = await iterableEternalStorage.getBytes16Keys(listId);
-
-                let textValues = [];
-                bytes16Values.forEach((value) => textValues.push(web3.utils.toAscii(value)) );
-
-                // sort, because the values can be in a different order
-                texts = texts.sort();
-
-                textValues.sort().forEach((text, index) => assert.strictEqual(texts[index], text) );
-            });
-
-            it("should remove the last key and decrease the key size", async () => {
-                await truffleAssert.passes(iterableEternalStorage.removeBytes16Key(listId, values[listSize - 1]));
-                // remove last item of array
-                values.pop();
-
-                let newListSize = await iterableEternalStorage.getBytes16KeySize(listId);
-                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
-
-                const bytes16Values = await iterableEternalStorage.getBytes16Keys(listId);
-
-                for (let i = 0; i < newListSize; i++) {
-                    assert.strictEqual(texts[i], web3.utils.toAscii(bytes16Values[i]));
-                }
-            });
-        });
-
-        describe('existsBytes16Key', async () => {
-            it("should return true for an existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsBytes16Key(listId, values[0]);
-                assert.isTrue(keyExists);
-            });
-
-            it("should false for a non-existing key", async () => {
-                const keyExists = await iterableEternalStorage.existsBytes16Key(listId, valueNotInList);
-                assert.isFalse(keyExists);
-            });
-        });
-    });
-
     describe('Bytes32', () => {
         beforeEach(async () => {
             for (let i = 0; i < listSize; i++) {
@@ -1455,6 +676,114 @@ contract('IterableEternalStorage', (accounts) => {
 
             it("should false for a non-existing key", async () => {
                 const keyExists = await iterableEternalStorage.existsStringKey(listId, valueNotInList);
+                assert.isFalse(keyExists);
+            });
+        });
+    });
+
+    describe('Bytes', () => {
+        beforeEach(async () => {
+            for (let i = 0; i < listSize; i++) {
+                let value;
+
+                while (true) {
+                    value = web3.utils.toHex(randomString.generate());
+
+                    if (!values.includes(value)) {
+                        break;
+                    }
+                }
+
+                await iterableEternalStorage.addBytesKey(listId, value);
+                values.push(value);
+            }
+
+            while (true) {
+                valueNotInList = web3.utils.toHex(randomString.generate());
+
+                if (!values.includes(valueNotInList)) {
+                    break;
+                }
+            }
+        });
+
+        describe('addBytesKey', async () => {
+            it("should revert when not called by latest version", async () => {
+                await truffleAssert.reverts(iterableEternalStorage.addBytesKey(listId, valueNotInList, {from: accounts[1]}));
+            });
+
+            it("should revert when an existing values is added", async () => {
+                await truffleAssert.reverts(iterableEternalStorage.addBytesKey(listId, values[0]));
+            });
+
+            it("should add a key and increase the key size", async () => {
+                let actualListSize = await iterableEternalStorage.getBytesKeySize(listId);
+                assert.isTrue(actualListSize.eq(web3.utils.toBN(listSize)), 'Length of list is not correct');
+
+                for (let i = 0; i < listSize; i++) {
+                    const bytesValue = await iterableEternalStorage.getBytesKeyByIndex(listId, i);
+                    assert.strictEqual(values[i], bytesValue, 'Incorrect value was saved');
+                }
+            });
+        });
+
+        describe('removeBytesKey', async () => {
+            it("should revert when not called by latest version", async () => {
+                await truffleAssert.reverts(iterableEternalStorage.removeBytesKey(listId, values[0], {from: accounts[1]}));
+            });
+
+            it("should revert when a non-existing key is given", async () => {
+                await truffleAssert.reverts(iterableEternalStorage.removeBytesKey(listId, valueNotInList));
+            });
+
+            it("should remove a key and decrease the key size", async () => {
+                await truffleAssert.passes(iterableEternalStorage.removeBytesKey(listId, values[randomIndex]));
+                // remove item which has been deleted in the smart contract
+                values.splice(randomIndex, 1);
+
+                let newListSize = await iterableEternalStorage.getBytesKeySize(listId);
+                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
+
+                let bytesValues = [];
+
+                for (let i = 0; i < newListSize; i++) {
+                    const bytesValue = await iterableEternalStorage.getBytesKeyByIndex(listId, i);
+                    bytesValues.push(bytesValue);
+                }
+
+                // sort, because the values can be in a different order
+                bytesValues.sort();
+                values.sort();
+
+                for (let i = 0; i < newListSize; i++) {
+                    assert.strictEqual(values[i], bytesValues[i]);
+                }
+            });
+
+            it("should remove the last key and decrease the key size", async () => {
+                await truffleAssert.passes(iterableEternalStorage.removeBytesKey(listId, values[listSize - 1]));
+                // remove last item of array
+                values.pop();
+
+                let newListSize = await iterableEternalStorage.getBytesKeySize(listId);
+                assert.isTrue(newListSize.eq(web3.utils.toBN(listSize - 1)), 'Length of list is not correct');
+
+                for (let i = 0; i < newListSize; i++) {
+                    const bytesValue = await iterableEternalStorage.getBytesKeyByIndex(listId, i);
+
+                    assert.strictEqual(values[i], bytesValue);
+                }
+            });
+        });
+
+        describe('existsBytesKey', async () => {
+            it("should return true for an existing key", async () => {
+                const keyExists = await iterableEternalStorage.existsBytesKey(listId, values[0]);
+                assert.isTrue(keyExists);
+            });
+
+            it("should false for a non-existing key", async () => {
+                const keyExists = await iterableEternalStorage.existsBytesKey(listId, valueNotInList);
                 assert.isFalse(keyExists);
             });
         });
