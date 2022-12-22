@@ -60,36 +60,6 @@ contract('EternalStorage', (accounts) => {
         assert.strictEqual(false, boolValue);
     });
 
-    it("getUInt8, setUInt8 and deleteUInt8 should work as expected", async() => {
-        const value = getRandomUInt();
-
-        await truffleAssert.reverts(eternalStorage.setUInt8(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setUInt8(key, value));
-
-        let uint8Value = await eternalStorage.getUInt8(key);
-        assert.isTrue(uint8Value.eq(web3.utils.toBN(value)));
-
-        await eternalStorage.deleteUInt8(key);
-
-        uint8Value = await eternalStorage.getUInt8(key);
-        assert.isTrue(uint8Value.eq(web3.utils.toBN(0)));
-    });
-
-    it("getUInt128, setUInt128 and deleteUInt128 should work as expected", async() => {
-        const value = getRandomUInt();
-
-        await truffleAssert.reverts(eternalStorage.setUInt128(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setUInt128(key, web3.utils.toBN(value.toString())));
-
-        let uint128Value = await eternalStorage.getUInt128(key);
-        assert.isTrue(uint128Value.eq(web3.utils.toBN(value.toString())));
-
-        await eternalStorage.deleteUInt128(key);
-
-        uint128Value = await eternalStorage.getUInt128(key);
-        assert.isTrue(uint128Value.eq(web3.utils.toBN(0)));
-    });
-
     it("getUInt256, setUInt256 and deleteUInt256 should work as expected", async() => {
         const value = getRandomUInt();
 
@@ -103,36 +73,6 @@ contract('EternalStorage', (accounts) => {
 
         uint256Value = await eternalStorage.getUInt256(key);
         assert.isTrue(uint256Value.eq(web3.utils.toBN(0)));
-    });
-
-    it("getInt8, setInt8 and deleteInt8 should work as expected", async() => {
-        const value = getRandomInt();
-
-        await truffleAssert.reverts(eternalStorage.setInt8(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setInt8(key, value));
-
-        let int8Value = await eternalStorage.getInt8(key);
-        assert.isTrue(int8Value.eq(web3.utils.toBN(value)));
-
-        await eternalStorage.deleteInt8(key);
-
-        int8Value = await eternalStorage.getInt8(key);
-        assert.isTrue(int8Value.eq(web3.utils.toBN(0)));
-    });
-
-    it("getInt128, setInt128 and deleteInt128 should work as expected", async() => {
-        const value = getRandomInt();
-
-        await truffleAssert.reverts(eternalStorage.setInt128(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setInt128(key, web3.utils.toBN(value.toString())));
-
-        let int128Value = await eternalStorage.getInt128(key);
-        assert.isTrue(int128Value.eq(web3.utils.toBN(value.toString())));
-
-        await eternalStorage.deleteInt128(key);
-
-        int128Value = await eternalStorage.getInt128(key);
-        assert.isTrue(int128Value.eq(web3.utils.toBN(0)));
     });
 
     it("getInt256, setInt256 and deleteInt256 should work as expected", async() => {
@@ -166,44 +106,15 @@ contract('EternalStorage', (accounts) => {
         assert.strictEqual(addressValue, ZERO_ADDRESS);
     });
 
-    it("getBytes8, setBytes8 and deleteBytes8 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(8));
-
-        await truffleAssert.reverts(eternalStorage.setBytes8(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setBytes8(key, value));
-
-        let bytes8Value = await eternalStorage.getBytes8(key);
-        assert.strictEqual(bytes8Value, web3.utils.bytesToHex(value));
-
-        await eternalStorage.deleteBytes8(key);
-
-        bytes8Value = await eternalStorage.getBytes8(key);
-        assert.strictEqual(bytes8Value, '0x0000000000000000');
-    });
-
-    it("getBytes16, setBytes16 and deleteBytes16 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(16));
-
-        await truffleAssert.reverts(eternalStorage.setBytes16(key, value, {from: accounts[1]}));
-        await truffleAssert.passes(eternalStorage.setBytes16(key, value));
-
-        let bytes16Value = await eternalStorage.getBytes16(key);
-        assert.strictEqual(bytes16Value, web3.utils.bytesToHex(value));
-
-        await eternalStorage.deleteBytes16(key);
-
-        bytes16Value = await eternalStorage.getBytes16(key);
-        assert.strictEqual(bytes16Value, '0x00000000000000000000000000000000');
-    });
-
     it("getBytes32, setBytes32 and deleteBytes32 should work as expected", async() => {
-        const value = web3.utils.hexToBytes(web3.utils.randomHex(32));
+        const text = randomString.generate(32);
+        const value = web3.utils.fromAscii(text);
 
         await truffleAssert.reverts(eternalStorage.setBytes32(key, value, {from: accounts[1]}));
         await truffleAssert.passes(eternalStorage.setBytes32(key, value));
 
         let bytes32Value = await eternalStorage.getBytes32(key);
-        assert.strictEqual(bytes32Value, web3.utils.bytesToHex(value));
+        assert.strictEqual(web3.utils.toAscii(bytes32Value), text);
 
         await eternalStorage.deleteBytes32(key);
 
@@ -221,6 +132,21 @@ contract('EternalStorage', (accounts) => {
         assert.strictEqual(stringValue, value);
 
         await eternalStorage.deleteString(key);
+
+        stringValue = await eternalStorage.getString(key);
+        assert.strictEqual(stringValue, '');
+    });
+
+    it("getBytes, setBytes and deleteBytes should work as expected", async() => {
+        const value = web3.utils.toHex(randomString.generate());
+
+        await truffleAssert.reverts(eternalStorage.setBytes(key, value, {from: accounts[1]}));
+        await truffleAssert.passes(eternalStorage.setBytes(key, value));
+
+        let bytesValue = await eternalStorage.getBytes(key);
+        assert.strictEqual(bytesValue, value);
+
+        await eternalStorage.deleteBytes(key);
 
         stringValue = await eternalStorage.getString(key);
         assert.strictEqual(stringValue, '');
