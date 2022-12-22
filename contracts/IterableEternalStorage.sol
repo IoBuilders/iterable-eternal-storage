@@ -1,13 +1,11 @@
-pragma solidity ^0.7.5;
+pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: Apache-2.0
 
 import "./EternalStorage.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./IIterableEternalStorage.sol";
 
 
 contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
-    using SafeMath for uint256;
 
     bytes32 private constant SIZE_POSTFIX = "listSize";
     bytes32 private constant VALUES_POSTFIX = "listValues";
@@ -429,7 +427,7 @@ contract IterableEternalStorage is EternalStorage, IIterableEternalStorage {
     function _calculateRangeSizeOfList(uint256 _listSize, uint256 _offset, uint256 _limit) private pure returns (uint256) {
         require(_offset < _listSize, "Offset is out of range");
 
-        uint256 rangeSize = _listSize.sub(_offset);
+        uint256 rangeSize = _listSize - _offset;
 
         if (rangeSize > _limit) {
             rangeSize = _limit;

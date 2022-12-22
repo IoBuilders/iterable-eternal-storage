@@ -52,7 +52,7 @@ contract('IterableEternalStorage', (accounts) => {
 
     beforeEach(async() => {
         iterableEternalStorage = await IterableEternalStorage.new();
-        iterableEternalStorage.upgradeVersion(accounts[0]);
+        await iterableEternalStorage.upgradeVersion(accounts[0]);
         listId = web3.utils.sha3(Math.random().toString());
 
         initListTest();

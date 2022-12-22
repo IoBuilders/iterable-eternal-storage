@@ -2,7 +2,7 @@ module.exports = {
     networks: {
         development: {
             host: "localhost",
-            port: 7545,
+            port: 8545,
             network_id: "*",
             gas: 8000000,
         },
@@ -16,8 +16,8 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: '0.7.5',
-            docker: true,
+            version: '0.8.17',
+            docker: false,
             settings: {
                 optimizer: {
                     enabled: true,
